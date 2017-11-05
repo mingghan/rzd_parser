@@ -11,6 +11,10 @@ import json
 import requests
 import urllib
 
+TOKEN = config.token
+URL = "https://api.telegram.org/bot{}/".format(TOKEN)
+
+# Parser
 def parse_rzd(counter, url, text_to_find):
 	page_url = url
 
@@ -27,10 +31,7 @@ def parse_rzd(counter, url, text_to_find):
 	print  "%d. No tickets yet" % counter
 	browser.close()
 
-TOKEN = config.token
-URL = "https://api.telegram.org/bot{}/".format(TOKEN)
-
-
+# Bot part
 def get_url(url):
 	response = requests.get(url)
 	content = response.content.decode("utf8")
