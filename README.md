@@ -6,12 +6,12 @@ This tool parses pass.rzd.ru site every 10 minutes and notifies user in Telegram
 ## Usage
 ### Preparation
 In order to use this tool you need to take some preparation steps:
-0. Install Mozilla Firefox browser
-1. Install selenium webdriver
+1. Install Mozilla Firefox browser
+2. Install selenium webdriver
 `pip install selenium`
-2. Install request library
+3. Install request library
 `pip install requests`
-3. Create Telegram bot and get token
+4. Create [Telegram bot](https://core.telegram.org/bots#6-botfather) and get token
 
 ### Tool
 1. `git clone https://github.com/mingghan/rzd_parser.git`
