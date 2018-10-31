@@ -1,6 +1,7 @@
 #!/usr/bin/python2.7
 # -*- coding:utf-8 -*-
 
+from __future__ import print_function
 from selenium import webdriver
 import time
 import sys
@@ -8,27 +9,48 @@ import config
 import json
 import requests
 import urllib
+import sys
+
 
 TOKEN = config.token
 URL = "https://api.telegram.org/bot{}/".format(TOKEN)
 
 
+def eprint(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)
+
+
 # Parser
-def parse_rzd(counter, url, text_to_find):
+def parse_rzd(counter, url, train_number, text_to_find):
     page_url = url
 
-    browser = webdriver.Firefox()
+    # browser = webdriver.Firefox()
+    options = webdriver.ChromeOptions()
+    options.add_argument('headless')
+    options.add_argument('window-size=1200x800')
+    browser = webdriver.Chrome(options=options)
+
     browser.get(page_url)
 
     time.sleep(10)
-    element_to_find = "//*[contains(text(), {0})]".format(text_to_find)
-    seats = browser.find_elements_by_xpath(element_to_find)
 
-    if len(seats) > 0:
-        print "There is tickets there"
-        return "There is tickets there"
+    items = browser.find_elements_by_class_name('route-item')
+    # print ("trains: %d" % len(items))
+    for item in items:
+        item_train_number = item.find_element_by_xpath('.//span[contains(@class, "route-trnum")]').text
+        # print(item_train_number)
+        if train_number not in item_train_number:
+            continue
 
-    print "%d. No tickets yet" % counter
+        element_to_find = ".//*[contains(text(), '{0}')]".format(text_to_find)
+        seats = item.find_elements_by_xpath(element_to_find)
+
+        if len(seats) > 0:
+            eprint("There is tickets there")
+            browser.close()
+            return "There is tickets there"
+
+    eprint("%d. No tickets yet" % counter)
     browser.close()
 
 
@@ -96,9 +118,10 @@ def main():
     text_to_find = ""
     if len(sys.argv) > 2:
         url = sys.argv[1]
-        text_to_find = sys.argv[2]
+        train_number = sys.argv[2]
+        text_to_find = sys.argv[3]
     else:
-        print "Please provide the url and text to find"
+        print("Please provide the url, train number and text to find")
         return
     while True:
         time.sleep(5)
@@ -108,12 +131,17 @@ def main():
         text = ''
         counter += 1
         try:
-            text = parse_rzd(counter, url, text_to_find)
-        except Exception, e:
-            print e
+            eprint("LOG: trying to open page")
+            text = parse_rzd(counter, url, train_number, text_to_find)
+            eprint("#%d %s" % (counter, text))
+        except Exception as e:
+            print(e)
 
         if text and chat_id:
+            text = text + " " + url
+            eprint("LOG: sending message '%s'" % text)
             send_message(text, chat_id)
+        eprint("LOG: going to sleep")
         time.sleep(10*60)
 
 
