@@ -46,9 +46,9 @@ def parse_rzd(counter, url, train_number, text_to_find):
         seats = item.find_elements_by_xpath(element_to_find)
 
         if len(seats) > 0:
-            eprint("There is tickets there")
+            eprint("There are tickets there")
             browser.close()
-            return "There is tickets there"
+            return "There are tickets there"
 
     eprint("%d. No tickets yet" % counter)
     browser.close()
